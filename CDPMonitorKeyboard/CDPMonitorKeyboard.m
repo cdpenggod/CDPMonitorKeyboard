@@ -9,8 +9,8 @@
 #import "CDPMonitorKeyboard.h"
 
 @implementation CDPMonitorKeyboard{
-    UIViewController *_controller;//输入view所在controller
-    
+    UIView *_superView;//输入view的父view
+    CGRect _superViewOldFrame;
 }
 
 //单例化
@@ -26,26 +26,27 @@
 }
 
 
-//当键盘出现时调用
--(void)keyboardWillShowWithController:(UIViewController *)controller andNotification:(NSNotification *)notification higherThanKeyboard:(NSInteger)valueOfTheHigher{
-    _controller=controller;
+//当键盘出现时调用方法
+-(void)keyboardWillShowWithSuperView:(UIView *)superView andNotification:(NSNotification *)notification higherThanKeyboard:(NSInteger)valueOfTheHigher{
+    _superView=superView;
+    _superViewOldFrame=superView.frame;
     //获取键盘的高度
     NSDictionary *userInfo = [notification userInfo];
     NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGRect keyboardRect = [aValue CGRectValue];
     NSInteger height = keyboardRect.size.height;
     
-    for (UIView *view in _controller.view.subviews) {
+    for (UIView *view in superView.subviews) {
         if (view.isFirstResponder==YES) {
-            NSInteger value=_controller.view.bounds.size.height-view.frame.origin.y-view.bounds.size.height;
+            NSInteger value=superView.bounds.size.height-view.frame.origin.y-view.bounds.size.height;
             if (value<height) {
                 [UIView animateWithDuration:0.3 animations:^{
                     //防止超出视图最大范围
                     if (value-height-valueOfTheHigher+height<=0) {
-                        _controller.view.frame=CGRectMake(0,-height,_controller.view.bounds.size.width,_controller.view.bounds.size.height);
+                        superView.frame=CGRectMake(0,-height,superView.bounds.size.width,superView.bounds.size.height);
                     }
                     else{
-                        _controller.view.frame=CGRectMake(0,value-height-valueOfTheHigher,_controller.view.bounds.size.width,_controller.view.bounds.size.height);
+                        superView.frame=CGRectMake(0,value-height-valueOfTheHigher,superView.bounds.size.width,superView.bounds.size.height);
                     }
                 }];
             }
@@ -53,13 +54,17 @@
     }
     
 }
+
 //当键退出时调用
 -(void)keyboardWillHide{
     [UIView animateWithDuration:0.3 animations:^{
-        _controller.view.frame=CGRectMake(0,0,_controller.view.bounds.size.width,_controller.view.bounds.size.height);
+        if (_superView) {
+            _superView.frame=_superViewOldFrame;
+
+        }
     }];
     
-    _controller=nil;
+    _superView=nil;
 }
 
 

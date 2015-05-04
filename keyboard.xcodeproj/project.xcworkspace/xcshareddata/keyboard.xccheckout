@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>32C1B9A3-7CE1-4C7A-B3F2-58255E7EE436</string>
+	<key>IDESourceControlProjectName</key>
+	<string>keyboard</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>44F3A51141BF9591E6E8939188443A5E5D3514DC</key>
+		<string>https://github.com/cdpenggod/CDPMonitorKeyboard.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>keyboard.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>44F3A51141BF9591E6E8939188443A5E5D3514DC</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/cdpenggod/CDPMonitorKeyboard.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>44F3A51141BF9591E6E8939188443A5E5D3514DC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>44F3A51141BF9591E6E8939188443A5E5D3514DC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>CDPMonitorKeyboard</string>
+		</dict>
+	</array>
+</dict>
+</plist>

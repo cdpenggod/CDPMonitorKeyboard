@@ -15,7 +15,8 @@
 +(CDPMonitorKeyboard *)defaultMonitorKeyboard;
 
 //键盘出现时调用方法
--(void)keyboardWillShowWithController:(UIViewController *)controller andNotification:(NSNotification *)notification higherThanKeyboard:(NSInteger)valueOfTheHigher;
+-(void)keyboardWillShowWithSuperView:(UIView *)superView andNotification:(NSNotification *)notification higherThanKeyboard:(NSInteger)valueOfTheHigher;
+
 
 //键盘消失时调用方法
 -(void)keyboardWillHide;

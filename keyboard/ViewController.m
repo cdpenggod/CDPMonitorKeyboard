@@ -26,6 +26,8 @@
     //增加监听，当键退出时收出消息
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
+    
+    
     UITextField *textField=[[UITextField alloc] initWithFrame:CGRectMake(0,400,self.view.bounds.size.width,30)];
     textField.backgroundColor=[UIColor greenColor];
     textField.text=@"这个高度设为刚好超过键盘,类似评论框等";
@@ -51,8 +53,9 @@
 #pragma mark 键盘监听方法设置
 //当键盘出现时调用
 -(void)keyboardWillShow:(NSNotification *)aNotification{
-    //第一个参数写self即可，第二个写监听获得的notification，第三个写希望高于键盘的高度(只在被键盘遮挡时才启用,如控件未被遮挡,则无变化)
-    [[CDPMonitorKeyboard defaultMonitorKeyboard] keyboardWillShowWithController:self andNotification:aNotification higherThanKeyboard:0];
+    //第一个参数写输入view的父view即可，第二个写监听获得的notification，第三个写希望高于键盘的高度(只在被键盘遮挡时才启用,如控件未被遮挡,则无变化)
+    //如果想不通输入view获得不同高度，可自己在此方法里分别判断区别
+    [[CDPMonitorKeyboard defaultMonitorKeyboard] keyboardWillShowWithSuperView:self.view andNotification:aNotification higherThanKeyboard:0];
     
 }
 //当键退出时调用
