@@ -52,6 +52,34 @@
             }
         }
     }
+    //tableView判断
+    if (superView.class==[UITableView class]) {
+        UITableView *tableView=(UITableView *)superView;
+        for (UITableViewCell *cell in [[superView.subviews objectAtIndex:0] subviews]) {
+            for (UIView *view in [[cell.subviews objectAtIndex:0] subviews]) {
+                if (view.isFirstResponder==YES) {
+                    UIView *cellView=view.superview.superview;
+                    float value1=cellView.frame.origin.y+cellView.bounds.size.height-tableView.contentOffset.y;
+                    float value2=tableView.bounds.size.height-value1;
+                    float value=value2+(superView.superview.bounds.size.height-superView.bounds.size.height-superView.frame.origin.y);
+                    
+                    if (value<height) {
+                        [UIView animateWithDuration:0.3 animations:^{
+                            //防止超出视图最大范围
+                            if (value-height-valueOfTheHigher+height<=0) {
+                                superView.frame=CGRectMake(0,_superViewOldFrame.origin.y-height,superView.bounds.size.width,superView.bounds.size.height);
+                            }
+                            else{
+                                superView.frame=CGRectMake(0,_superViewOldFrame.origin.y+(value-height-valueOfTheHigher),superView.bounds.size.width,superView.bounds.size.height);
+                            }
+                        }];
+                    }
+
+                }
+            }
+            
+        }
+    }
     
 }
 
