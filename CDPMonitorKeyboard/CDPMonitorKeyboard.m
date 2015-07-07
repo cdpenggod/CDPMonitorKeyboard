@@ -59,7 +59,7 @@
             for (UIView *view in [[cell.subviews objectAtIndex:0] subviews]) {
                 if (view.isFirstResponder==YES) {
                     UIView *cellView=view.superview.superview;
-                    float value1=cellView.frame.origin.y+cellView.bounds.size.height-tableView.contentOffset.y;
+                    float value1=cellView.frame.origin.y+view.bounds.size.height+view.frame.origin.y-tableView.contentOffset.y;
                     float value2=tableView.bounds.size.height-value1;
                     float value=value2+(superView.superview.bounds.size.height-superView.bounds.size.height-superView.frame.origin.y);
                     
