@@ -3,4 +3,4 @@ The CDPMonitorKeyboard package can solve the problem which input view were cover
 
 If you use tableView,send the tableView to the first parameter superView directly.
 
- ![image](https://github.com/cdpenggod/CDPMonitorKeyboard/blob/master/Untitled.gif)
+ ![image](https://github.com/cdpenggod/CDPMonitorKeyboard/blob/master/gif.gif)
