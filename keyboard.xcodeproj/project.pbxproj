@@ -15,6 +15,9 @@
 		5E8FEF6C1AED287C00F97C8E /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E8FEF6A1AED287C00F97C8E /* LaunchScreen.xib */; };
 		5E8FEF781AED287C00F97C8E /* keyboardTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E8FEF771AED287C00F97C8E /* keyboardTests.m */; };
 		5E8FEF861AED2B5800F97C8E /* CDPMonitorKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E8FEF851AED2B5800F97C8E /* CDPMonitorKeyboard.m */; };
+		5EA7E5501B9858760048B274 /* CDPDefaultModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA7E54F1B9858760048B274 /* CDPDefaultModeViewController.m */; };
+		5EA7E5531B98589E0048B274 /* CDPTableVIewModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA7E5521B98589E0048B274 /* CDPTableVIewModeViewController.m */; };
+		5EA7E5591B9858E50048B274 /* CDPScrollViewModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA7E5581B9858E50048B274 /* CDPScrollViewModeViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +46,12 @@
 		5E8FEF771AED287C00F97C8E /* keyboardTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = keyboardTests.m; sourceTree = "<group>"; };
 		5E8FEF841AED2B5800F97C8E /* CDPMonitorKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDPMonitorKeyboard.h; sourceTree = "<group>"; };
 		5E8FEF851AED2B5800F97C8E /* CDPMonitorKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDPMonitorKeyboard.m; sourceTree = "<group>"; };
+		5EA7E54E1B9858760048B274 /* CDPDefaultModeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDPDefaultModeViewController.h; sourceTree = "<group>"; };
+		5EA7E54F1B9858760048B274 /* CDPDefaultModeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDPDefaultModeViewController.m; sourceTree = "<group>"; };
+		5EA7E5511B98589E0048B274 /* CDPTableVIewModeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDPTableVIewModeViewController.h; sourceTree = "<group>"; };
+		5EA7E5521B98589E0048B274 /* CDPTableVIewModeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDPTableVIewModeViewController.m; sourceTree = "<group>"; };
+		5EA7E5571B9858E50048B274 /* CDPScrollViewModeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDPScrollViewModeViewController.h; sourceTree = "<group>"; };
+		5EA7E5581B9858E50048B274 /* CDPScrollViewModeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDPScrollViewModeViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +98,9 @@
 				5E8FEF601AED287C00F97C8E /* AppDelegate.m */,
 				5E8FEF621AED287C00F97C8E /* ViewController.h */,
 				5E8FEF631AED287C00F97C8E /* ViewController.m */,
+				5EA7E5541B9858AA0048B274 /* defaultMode */,
+				5EA7E5561B9858C40048B274 /* tableViewMode */,
+				5EA7E5551B9858C10048B274 /* scrollViewMode */,
 				5E8FEF651AED287C00F97C8E /* Main.storyboard */,
 				5E8FEF681AED287C00F97C8E /* Images.xcassets */,
 				5E8FEF6A1AED287C00F97C8E /* LaunchScreen.xib */,
@@ -130,6 +142,33 @@
 				5E8FEF851AED2B5800F97C8E /* CDPMonitorKeyboard.m */,
 			);
 			path = CDPMonitorKeyboard;
+			sourceTree = "<group>";
+		};
+		5EA7E5541B9858AA0048B274 /* defaultMode */ = {
+			isa = PBXGroup;
+			children = (
+				5EA7E54E1B9858760048B274 /* CDPDefaultModeViewController.h */,
+				5EA7E54F1B9858760048B274 /* CDPDefaultModeViewController.m */,
+			);
+			name = defaultMode;
+			sourceTree = "<group>";
+		};
+		5EA7E5551B9858C10048B274 /* scrollViewMode */ = {
+			isa = PBXGroup;
+			children = (
+				5EA7E5571B9858E50048B274 /* CDPScrollViewModeViewController.h */,
+				5EA7E5581B9858E50048B274 /* CDPScrollViewModeViewController.m */,
+			);
+			name = scrollViewMode;
+			sourceTree = "<group>";
+		};
+		5EA7E5561B9858C40048B274 /* tableViewMode */ = {
+			isa = PBXGroup;
+			children = (
+				5EA7E5511B98589E0048B274 /* CDPTableVIewModeViewController.h */,
+				5EA7E5521B98589E0048B274 /* CDPTableVIewModeViewController.m */,
+			);
+			name = tableViewMode;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -233,8 +272,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E8FEF641AED287C00F97C8E /* ViewController.m in Sources */,
+				5EA7E5501B9858760048B274 /* CDPDefaultModeViewController.m in Sources */,
 				5E8FEF611AED287C00F97C8E /* AppDelegate.m in Sources */,
+				5EA7E5591B9858E50048B274 /* CDPScrollViewModeViewController.m in Sources */,
 				5E8FEF5E1AED287C00F97C8E /* main.m in Sources */,
+				5EA7E5531B98589E0048B274 /* CDPTableVIewModeViewController.m in Sources */,
 				5E8FEF861AED2B5800F97C8E /* CDPMonitorKeyboard.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -436,6 +478,7 @@
 				5E8FEF7D1AED287C00F97C8E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5E8FEF7E1AED287C00F97C8E /* Build configuration list for PBXNativeTarget "keyboardTests" */ = {
 			isa = XCConfigurationList;
@@ -444,6 +487,7 @@
 				5E8FEF801AED287C00F97C8E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
