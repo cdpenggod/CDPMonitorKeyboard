@@ -52,7 +52,7 @@
     textField1.text=@"上方输入视图超过键盘下移";
     [scrollView addSubview:textField1];
     
-    UITextField *textField2=[[UITextField alloc] initWithFrame:CGRectMake(14,scrollView.bounds.size.height-40,200,30)];
+    UITextField *textField2=[[UITextField alloc] initWithFrame:CGRectMake(14,scrollView.bounds.size.height-80,200,30)];
     textField2.backgroundColor=[UIColor whiteColor];
     textField2.font=[UIFont systemFontOfSize:14];
     textField2.backgroundColor=[UIColor cyanColor];

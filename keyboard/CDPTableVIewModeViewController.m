@@ -10,7 +10,7 @@
 
 #import "CDPMonitorKeyboard.h"//引入头文件
 
-@interface CDPTableVIewModeViewController () <UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate,CDPMonitorKeyboardDelegate>//协议非必须遵守,看需求
+@interface CDPTableVIewModeViewController () <UITableViewDataSource,UITableViewDelegate,CDPMonitorKeyboardDelegate>//协议非必须遵守,看需求
 
 @end
 
@@ -42,7 +42,7 @@
     tableView.delegate=self;
     tableView.dataSource=self;
     [self.view addSubview:tableView];
-
+    
     _topLabel=[[UILabel alloc] initWithFrame:CGRectMake(100,60,150,30)];
     _topLabel.textColor=[UIColor redColor];
     _topLabel.text=@"自动注册键盘监听";
@@ -53,7 +53,7 @@
     [[CDPMonitorKeyboard defaultMonitorKeyboard] sendValueWithSuperView:tableView higherThanKeyboard:0 andMode:CDPMonitorKeyboardTableViewMode navigationControllerTopHeight:0];
     //代理看需求，非必须
     [CDPMonitorKeyboard defaultMonitorKeyboard].delegate=self;
-
+    
 }
 #pragma mark CDPMonitorKeyboardDelegate
 //系统键盘出现
@@ -85,18 +85,22 @@
         UITextField *textField=[[UITextField alloc] initWithFrame:CGRectMake(10,5,cell.bounds.size.width-20,20)];
         textField.backgroundColor=[UIColor greenColor];
         textField.text=[NSString stringWithFormat:@"输入栏%ld",(long)indexPath.row];
-        [cell addSubview:textField];
+        [cell.contentView addSubview:textField];
+        
     }
     
     return cell;
 }
-
-#pragma mark scrollViewDelegate
 //tableView滑动时
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    //当isShowKeyboard==YES时,tableView滑动不收起键盘
+    //如果项目里写了tableView滑动取消键盘的代码，必须在相关函数里面加入此判断
+    if ([CDPMonitorKeyboard defaultMonitorKeyboard].isShowKeyboard==YES) {
+        return;
+    }
     [self.view endEditing:YES];
 }
-
+#pragma mark - 点击事件
 //点击空白处结束编辑状态
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
     [self.view endEditing:YES];

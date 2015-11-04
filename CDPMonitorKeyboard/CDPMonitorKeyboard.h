@@ -37,6 +37,10 @@ typedef NSInteger CDPMonitorKeyboardMode;//模式
 
 @interface CDPMonitorKeyboard : NSObject
 
+//当isShowKeyboard==YES时,tableView滑动可判断YES时不收起键盘
+//如果项目里写了tableView滑动取消键盘的代码，必须在相关函数里面取消键盘代码前加入此判断
+@property (nonatomic,assign,readonly) BOOL isShowKeyboard;
+
 
 @property (nonatomic,weak) id <CDPMonitorKeyboardDelegate> delegate;
 
@@ -53,7 +57,6 @@ typedef NSInteger CDPMonitorKeyboardMode;//模式
 //navigationControllerTopHeight为主视图的navigationBar高度+状态栏高度，如没有使用navigationController传0
 
 -(void)sendValueWithSuperView:(UIView *)superView higherThanKeyboard:(NSInteger)valueOfHigher andMode:(CDPMonitorKeyboardMode)mode navigationControllerTopHeight:(NSInteger)topHeight;
-
 
 
 

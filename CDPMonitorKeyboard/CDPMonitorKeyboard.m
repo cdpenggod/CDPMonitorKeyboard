@@ -18,6 +18,7 @@
 
     NSInteger _topHeight;//navigationBar高度+状态栏高度(20)
     
+    NSInteger _keyboardHeight;//键盘高度
 }
 
 //单例化
@@ -33,10 +34,14 @@
 }
 -(instancetype)init{
     if (self=[super init]) {
-        //增加监听，当键盘出现或改变时收出消息
+        //增加监听，当键盘出现时收消息
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        //增加监听，当键退出时收出消息
+        //增加监听，当键盘退出时收消息
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+        //增加监听，当textField开始编辑时收消息
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldBeginEdit:) name:UITextFieldTextDidBeginEditingNotification object:nil];
+        //增加监听，当textView开始编辑时收消息
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewBeginEdit:) name:UITextViewTextDidBeginEditingNotification object:nil];
     }
     
     return self;
@@ -45,6 +50,8 @@
     //取消监听
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextViewTextDidBeginEditingNotification object:nil];
 
 }
 //自动监听调用方法(仅需调用一次，若果需要改变参数再调用)
@@ -53,6 +60,43 @@
     _valueOfHigher=valueOfHigher;
     _mode=mode;
     _topHeight=topHeight;
+}
+#pragma mark - textField和textView开始编辑监听
+//textField开始编辑监听
+-(void)textFieldBeginEdit:(NSNotification *)notification{
+    switch (_mode) {
+        case CDPMonitorKeyboardDefaultMode:
+            [self defaultModeWithKeyboardHeight:_keyboardHeight];
+            break;
+        case CDPMonitorKeyboardTableViewMode:
+            [self tableViewModeWithKeyboardHeight:_keyboardHeight];
+            break;
+        case CDPMonitorKeyboardScrollViewMode:
+            [self scrollViewModeWithKeyboardHeight:_keyboardHeight];
+            break;
+            
+        default:
+            NSLog(@"CDPMonitorKeyboardMode模式设定错误");
+            break;
+    }
+}
+//textView开始编辑监听
+-(void)textViewBeginEdit:(NSNotification *)notification{
+    switch (_mode) {
+        case CDPMonitorKeyboardDefaultMode:
+            [self defaultModeWithKeyboardHeight:_keyboardHeight];
+            break;
+        case CDPMonitorKeyboardTableViewMode:
+            [self tableViewModeWithKeyboardHeight:_keyboardHeight];
+            break;
+        case CDPMonitorKeyboardScrollViewMode:
+            [self scrollViewModeWithKeyboardHeight:_keyboardHeight];
+            break;
+            
+        default:
+            NSLog(@"CDPMonitorKeyboardMode模式设定错误");
+            break;
+    }
 }
 #pragma mark - 监听系统键盘
 //键盘出现
@@ -73,10 +117,12 @@
 //当键盘出现时调用方法
 -(void)didKeyboardWillShowWithNotification:(NSNotification *)notification{
     //获取键盘的高度
+
     NSDictionary *userInfo=[notification userInfo];
     NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGRect keyboardRect = [aValue CGRectValue];
     NSInteger height = keyboardRect.size.height;
+    _keyboardHeight=height;
     
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:
@@ -94,8 +140,6 @@
             break;
     }
     
-    
-    
 }
 //当键退出时调用
 -(void)didKeyboardWillHide{
@@ -108,7 +152,9 @@
 #pragma mark - 键盘各模式
 //一般模式下
 -(void)defaultModeWithKeyboardHeight:(NSInteger)height{
-    _superView.transform=CGAffineTransformIdentity;
+    [UIView animateWithDuration:0.25 animations:^{
+        _superView.transform=CGAffineTransformIdentity;
+    }];
     
     for (UIView *view in _superView.subviews) {
         if (view.isFirstResponder==YES) {
@@ -130,22 +176,34 @@
 }
 //tableView模式下
 -(void)tableViewModeWithKeyboardHeight:(NSInteger)height{
-    _superView.transform=CGAffineTransformIdentity;
-
+    [UIView animateWithDuration:0.25 animations:^{
+        _superView.transform=CGAffineTransformIdentity;
+    }];
+    
     if (_mode==CDPMonitorKeyboardTableViewMode) {
         UITableView *tableView=(UITableView *)_superView;
         for (UITableViewCell *cell in [[_superView.subviews objectAtIndex:0] subviews]) {
             for (UIView *view in [[cell.subviews objectAtIndex:0] subviews]) {
                 if (view.isFirstResponder==YES) {
+                    
+                    if (tableView.contentOffset.y>0) {
+                        _isShowKeyboard=YES;
+                        NSIndexPath *indexPath=[tableView indexPathForCell:cell];
+                        [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+                    }
+                    _isShowKeyboard=NO;
+
+
                     UIView *cellView=view.superview.superview;
-                    float value1=cellView.frame.origin.y+view.bounds.size.height+view.frame.origin.y-tableView.contentOffset.y;
+                    float value1=cellView.frame.origin.y+CGRectGetMaxY(view.frame)-tableView.contentOffset.y;
                     float value2=tableView.bounds.size.height-value1;
+                    
                     if (value2<0) {
-                        tableView.contentOffset=CGPointMake(0,-value2);
+                        float y=tableView.contentOffset.y;
+                        tableView.contentOffset=CGPointMake(0,y-value2);
                         value2=0;
                     }
-                    float value=value2+([UIScreen mainScreen].bounds.size.height-tableView.bounds.size.height-tableView.frame.origin.y-_topHeight);
-                    
+                    float value=value2+([UIScreen mainScreen].bounds.size.height-CGRectGetMaxY(tableView.frame)-_topHeight);
                     [UIView animateWithDuration:0.3 animations:^{
                         _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
                     }];
@@ -156,7 +214,9 @@
 }
 //scrollView模式下
 -(void)scrollViewModeWithKeyboardHeight:(NSInteger)height{
-    _superView.transform=CGAffineTransformIdentity;
+    [UIView animateWithDuration:0.25 animations:^{
+        _superView.transform=CGAffineTransformIdentity;
+    }];
     
     if (_mode==CDPMonitorKeyboardScrollViewMode) {
         UIScrollView *scrollView=(UIScrollView *)_superView;
