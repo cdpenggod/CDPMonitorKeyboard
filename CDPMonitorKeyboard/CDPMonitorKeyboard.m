@@ -167,7 +167,7 @@
     
     for (UIView *view in _superView.subviews) {
         if (view.isFirstResponder==YES) {
-            NSInteger value=GetHeight(_superView)-_topHeight-CDPMaxY(view);
+            NSInteger value=CDPGetHeight(_superView)-_topHeight-CDPMaxY(view);
             if (value<height) {
                 [UIView animateWithDuration:0.3 animations:^{
                     //防止超出屏幕最大范围
