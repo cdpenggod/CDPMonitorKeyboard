@@ -8,6 +8,15 @@
 
 #import "CDPMonitorKeyboard.h"
 
+#define CDPSWIDTH   [UIScreen mainScreen].bounds.size.width
+#define CDPSHEIGHT  [UIScreen mainScreen].bounds.size.height
+#define CDPMinX(view) CGRectGetMinX(view.frame)
+#define CDPMinY(view) CGRectGetMinY(view.frame)
+#define CDPMaxX(view) CGRectGetMaxX(view.frame)
+#define CDPMaxY(view) CGRectGetMaxY(view.frame)
+#define CDPGetWidth(view) view.bounds.size.width
+#define CDPGetHeight(view) view.bounds.size.height
+
 @implementation CDPMonitorKeyboard{
     
     UIView *_superView;//输入view的父view
@@ -158,7 +167,7 @@
     
     for (UIView *view in _superView.subviews) {
         if (view.isFirstResponder==YES) {
-            NSInteger value=_superView.bounds.size.height-_topHeight-(view.frame.origin.y+view.bounds.size.height);
+            NSInteger value=GetHeight(_superView)-_topHeight-CDPMaxY(view);
             if (value<height) {
                 [UIView animateWithDuration:0.3 animations:^{
                     //防止超出屏幕最大范围
@@ -182,31 +191,35 @@
     
     if (_mode==CDPMonitorKeyboardTableViewMode) {
         UITableView *tableView=(UITableView *)_superView;
-        for (UITableViewCell *cell in [[_superView.subviews objectAtIndex:0] subviews]) {
-            for (UIView *view in [[cell.subviews objectAtIndex:0] subviews]) {
-                if (view.isFirstResponder==YES) {
-                    
-                    if (tableView.contentOffset.y>0) {
-                        _isShowKeyboard=YES;
-                        NSIndexPath *indexPath=[tableView indexPathForCell:cell];
-                        [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+        
+        for (UIView *wrapperView in tableView.subviews) {
+            if (CDPGetWidth(wrapperView)==CDPGetWidth(tableView)&&CDPGetHeight(wrapperView)==CDPGetHeight(tableView)) {
+                for (UITableViewCell *cell in [wrapperView subviews]) {
+                    for (UIView *view in [cell.contentView subviews]) {
+                        if (view.isFirstResponder==YES) {
+                            if (tableView.contentOffset.y>0) {
+                                _isShowKeyboard=YES;
+                                NSIndexPath *indexPath=[tableView indexPathForCell:cell];
+                                [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+                            }
+                            _isShowKeyboard=NO;
+                            
+                            
+                            UIView *cellView=view.superview.superview;
+                            float value1=CDPMinY(cellView)+CDPMaxY(view)-tableView.contentOffset.y;
+                            float value2=CDPGetHeight(tableView)-value1;
+                            
+                            if (value2<0) {
+                                float y=tableView.contentOffset.y;
+                                tableView.contentOffset=CGPointMake(0,y-value2);
+                                value2=0;
+                            }
+                            float value=value2+(CDPSHEIGHT-CDPMaxY(tableView)-_topHeight);
+                            [UIView animateWithDuration:0.3 animations:^{
+                                _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+                            }];
+                        }
                     }
-                    _isShowKeyboard=NO;
-
-
-                    UIView *cellView=view.superview.superview;
-                    float value1=cellView.frame.origin.y+CGRectGetMaxY(view.frame)-tableView.contentOffset.y;
-                    float value2=tableView.bounds.size.height-value1;
-                    
-                    if (value2<0) {
-                        float y=tableView.contentOffset.y;
-                        tableView.contentOffset=CGPointMake(0,y-value2);
-                        value2=0;
-                    }
-                    float value=value2+([UIScreen mainScreen].bounds.size.height-CGRectGetMaxY(tableView.frame)-_topHeight);
-                    [UIView animateWithDuration:0.3 animations:^{
-                        _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
-                    }];
                 }
             }
         }
@@ -222,13 +235,13 @@
         UIScrollView *scrollView=(UIScrollView *)_superView;
         for (UIView *view in [_superView subviews]) {
             if (view.isFirstResponder==YES) {
-                float value1=view.bounds.size.height+view.frame.origin.y-scrollView.contentOffset.y;
-                float value2=scrollView.bounds.size.height-value1;
+                float value1=CDPMaxY(view)-scrollView.contentOffset.y;
+                float value2=CDPGetHeight(scrollView)-value1;
                 if (value2<0) {
                     scrollView.contentOffset=CGPointMake(0,-value2);
                     value2=0;
                 }
-                float value=value2+([UIScreen mainScreen].bounds.size.height-scrollView.bounds.size.height-scrollView.frame.origin.y-_topHeight);
+                float value=value2+(CDPSHEIGHT-CDPMaxY(scrollView)-_topHeight);
                 
                 [UIView animateWithDuration:0.3 animations:^{
                     _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
