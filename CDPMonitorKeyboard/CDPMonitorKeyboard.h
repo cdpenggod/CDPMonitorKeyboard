@@ -13,7 +13,7 @@
 
 enum{
     CDPMonitorKeyboardDefaultMode=0,//一般模式(输入视图在主视图，即在self.view上)
-    CDPMonitorKeyboardTableViewMode,//tableView模式(输入视图在tableView上且tableView父视图为主视图，即self.view)
+    CDPMonitorKeyboardTableViewMode,//tableView模式(输入视图在tableView的cell.contentView上且tableView父视图为主视图，即self.view)
     CDPMonitorKeyboardScrollViewMode,//scrollView模式(输入视图在scrollView上且scrollView父视图为主视图，即self.view)
 };
 typedef NSInteger CDPMonitorKeyboardMode;//模式
