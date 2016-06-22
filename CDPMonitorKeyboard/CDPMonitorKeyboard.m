@@ -197,13 +197,11 @@
                 for (UITableViewCell *cell in [wrapperView subviews]) {
                     for (UIView *view in [cell.contentView subviews]) {
                         if (view.isFirstResponder==YES) {
-                            if (tableView.contentOffset.y>0) {
-                                _isShowKeyboard=YES;
+                            _isShowKeyboard=YES;
+                            if (tableView.contentOffset.y>0&&_changeWhenHigher==YES) {
                                 NSIndexPath *indexPath=[tableView indexPathForCell:cell];
                                 [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
                             }
-                            _isShowKeyboard=NO;
-                            
                             
                             UIView *cellView=view.superview.superview;
                             float value1=CDPMinY(cellView)+CDPMaxY(view)-tableView.contentOffset.y;
@@ -215,9 +213,18 @@
                                 value2=0;
                             }
                             float value=value2+(CDPSHEIGHT-CDPMaxY(tableView)-_topHeight);
-                            [UIView animateWithDuration:0.3 animations:^{
-                                _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
-                            }];
+                            
+                            //判断changeWhenHigher以及是否被遮挡,不遮挡则不改变
+                            if(_changeWhenHigher==YES||value-height-_valueOfHigher<0){
+                                [UIView animateWithDuration:0.3 animations:^{
+                                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+                                }completion:^(BOOL finished) {
+                                    _isShowKeyboard=NO;
+                                }];
+                            }
+                            else{
+                                _isShowKeyboard=NO;
+                            }
                         }
                     }
                 }
