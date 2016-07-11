@@ -70,6 +70,16 @@
     _mode=mode;
     _topHeight=topHeight;
 }
+//清空并重置所有相关数据,防止因为单例造成内存问题(推荐在dealloc中调用)
+-(void)clearAll{
+    _superView=nil;
+    _valueOfHigher=0;
+    _mode=0;
+    _topHeight=0;
+    _delegate=nil;
+    _changeWhenHigher=NO;
+    _isShowKeyboard=NO;
+}
 #pragma mark - textField和textView开始编辑监听
 //textField开始编辑监听
 -(void)textFieldBeginEdit:(NSNotification *)notification{
