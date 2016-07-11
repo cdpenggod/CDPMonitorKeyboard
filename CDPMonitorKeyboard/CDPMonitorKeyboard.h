@@ -70,7 +70,10 @@ typedef NSInteger CDPMonitorKeyboardMode;//模式
  */
 -(void)sendValueWithSuperView:(UIView *)superView higherThanKeyboard:(NSInteger)valueOfHigher andMode:(CDPMonitorKeyboardMode)mode navigationControllerTopHeight:(NSInteger)topHeight;
 
-
+/**
+ *  清空并重置所有相关数据,防止因为单例造成内存问题(推荐在dealloc中调用)
+ */
+-(void)clearAll;
 
 
 
