@@ -55,6 +55,10 @@
     [CDPMonitorKeyboard defaultMonitorKeyboard].delegate=self;
     
 }
+-(void)dealloc{
+    //清空并重置数据
+    [[CDPMonitorKeyboard defaultMonitorKeyboard] clearAll];
+}
 #pragma mark CDPMonitorKeyboardDelegate
 //系统键盘出现
 -(void)didWhenKeyboardWillShow:(NSNotification *)notification{
