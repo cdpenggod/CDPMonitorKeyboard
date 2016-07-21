@@ -17,6 +17,12 @@
 #define CDPGetWidth(view) view.bounds.size.width
 #define CDPGetHeight(view) view.bounds.size.height
 
+#ifdef DEBUG
+#    define CDPLog(fmt,...) NSLog(fmt@"\n\n[函数名:%s][行号:%d]",##__VA_ARGS__,__FUNCTION__,__LINE__)
+#else
+#    define CDPLog(fmt,...) /* */
+#endif
+
 @implementation CDPMonitorKeyboard{
     
     UIView *_superView;//输入view的父view
@@ -28,6 +34,8 @@
     NSInteger _topHeight;//navigationBar高度+状态栏高度(20)
     
     NSInteger _keyboardHeight;//键盘高度
+    
+    UIView *_responderView;//记录当前响应键盘view(一般为textField和textView)
 }
 
 //单例化
@@ -79,10 +87,13 @@
     _delegate=nil;
     _changeWhenHigher=NO;
     _isShowKeyboard=NO;
+    _responderView=nil;
 }
 #pragma mark - textField和textView开始编辑监听
 //textField开始编辑监听
 -(void)textFieldBeginEdit:(NSNotification *)notification{
+    _responderView=notification.object;
+    
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:
             [self defaultModeWithKeyboardHeight:_keyboardHeight];
@@ -95,12 +106,14 @@
             break;
             
         default:
-            NSLog(@"CDPMonitorKeyboardMode模式设定错误");
+            CDPLog(@"CDPMonitorKeyboardMode模式设定错误");
             break;
     }
 }
 //textView开始编辑监听
 -(void)textViewBeginEdit:(NSNotification *)notification{
+    _responderView=notification.object;
+    
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:
             [self defaultModeWithKeyboardHeight:_keyboardHeight];
@@ -113,7 +126,7 @@
             break;
             
         default:
-            NSLog(@"CDPMonitorKeyboardMode模式设定错误");
+            CDPLog(@"CDPMonitorKeyboardMode模式设定错误");
             break;
     }
 }
@@ -136,7 +149,6 @@
 //当键盘出现时调用方法
 -(void)didKeyboardWillShowWithNotification:(NSNotification *)notification{
     //获取键盘的高度
-
     NSDictionary *userInfo=[notification userInfo];
     NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGRect keyboardRect = [aValue CGRectValue];
@@ -155,7 +167,7 @@
             break;
             
         default:
-            NSLog(@"CDPMonitorKeyboardMode模式设定错误");
+            CDPLog(@"CDPMonitorKeyboardMode模式设定错误");
             break;
     }
     
@@ -175,21 +187,24 @@
         _superView.transform=CGAffineTransformIdentity;
     }];
     
-    for (UIView *view in _superView.subviews) {
-        if (view.isFirstResponder==YES) {
-            NSInteger value=CDPGetHeight(_superView)-_topHeight-CDPMaxY(view);
-            if (value<height) {
-                [UIView animateWithDuration:0.3 animations:^{
-                    //防止超出屏幕最大范围
-                    if ((height-value)+_valueOfHigher-height>0) {
-                        _superView.transform=CGAffineTransformMakeTranslation(0,-height);
-                    }
-                    else{
-                        _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
-                    }
-                }];
-            }
+    UIView *view=[self getResponderViewWithMode:CDPMonitorKeyboardDefaultMode];
+    
+    if (view) {
+        NSInteger value=CDPGetHeight(_superView)-_topHeight-CDPMaxY(view);
+        if (value<height) {
+            [UIView animateWithDuration:0.3 animations:^{
+                //防止超出屏幕最大范围
+                if ((height-value)+_valueOfHigher-height>0) {
+                    _superView.transform=CGAffineTransformMakeTranslation(0,-height);
+                }
+                else{
+                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+                }
+            }];
         }
+    }
+    else{
+        CDPLog(@"CDPMonitorKeyboard没找到键盘响应view");
     }
 
 }
@@ -200,45 +215,55 @@
     }];
     
     if (_mode==CDPMonitorKeyboardTableViewMode) {
-        UITableView *tableView=(UITableView *)_superView;
-        
-        for (UIView *wrapperView in tableView.subviews) {
-            if (CDPGetWidth(wrapperView)==CDPGetWidth(tableView)&&CDPMinX(wrapperView)==0&&CDPMinY(wrapperView)==0) {
-                for (UITableViewCell *cell in [wrapperView subviews]) {
-                    for (UIView *view in [cell.contentView subviews]) {
-                        if (view.isFirstResponder==YES) {
-                            _isShowKeyboard=YES;
-                            if (tableView.contentOffset.y>0&&_changeWhenHigher==YES) {
-                                NSIndexPath *indexPath=[tableView indexPathForCell:cell];
-                                [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-                            }
-                            
-                            UIView *cellView=view.superview.superview;
-                            float value1=CDPMinY(cellView)+CDPMaxY(view)-tableView.contentOffset.y;
-                            float value2=CDPGetHeight(tableView)-value1;
-                            
-                            if (value2<0) {
-                                float y=tableView.contentOffset.y;
-                                tableView.contentOffset=CGPointMake(0,y-value2);
-                                value2=0;
-                            }
-                            float value=value2+(CDPSHEIGHT-CDPMaxY(tableView)-_topHeight);
-                            
-                            //判断changeWhenHigher以及是否被遮挡,不遮挡则不改变
-                            if(_changeWhenHigher==YES||value-height-_valueOfHigher<0){
-                                [UIView animateWithDuration:0.3 animations:^{
-                                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
-                                }completion:^(BOOL finished) {
-                                    _isShowKeyboard=NO;
-                                }];
-                            }
-                            else{
-                                _isShowKeyboard=NO;
-                            }
-                        }
-                    }
-                }
+        UIView *view=[self getResponderViewWithMode:CDPMonitorKeyboardTableViewMode];
+
+        if (view) {
+            UITableView *tableView=(UITableView *)_superView;
+            
+            UITableViewCell *cell=nil;
+            if ([view.superview.superview isKindOfClass:[UITableViewCell class]]) {
+                //view在cell的contentView上
+                cell=(UITableViewCell *)view.superview.superview;
             }
+            else if ([view.superview isKindOfClass:[UITableViewCell class]]){
+                //view在cell上
+                cell=(UITableViewCell *)view.superview;
+            }
+            else{
+                CDPLog(@"当前CDPMonitorKeyboardTableViewMode模式,没有找到键盘响应view所在cell");
+                return;
+            }
+            
+            _isShowKeyboard=YES;
+            if (tableView.contentOffset.y>0&&_changeWhenHigher==YES&&cell) {
+                NSIndexPath *indexPath=[tableView indexPathForCell:cell];
+                [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+            }
+            
+            float value1=CDPMinY(cell)+CDPMaxY(view)-tableView.contentOffset.y;
+            float value2=CDPGetHeight(tableView)-value1;
+            
+            if (value2<0) {
+                float y=tableView.contentOffset.y;
+                tableView.contentOffset=CGPointMake(0,y-value2);
+                value2=0;
+            }
+            float value=value2+(CDPSHEIGHT-CDPMaxY(tableView)-_topHeight);
+            
+            //判断changeWhenHigher以及是否被遮挡,不遮挡则不改变
+            if(_changeWhenHigher==YES||value-height-_valueOfHigher<0){
+                [UIView animateWithDuration:0.3 animations:^{
+                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+                }completion:^(BOOL finished) {
+                    _isShowKeyboard=NO;
+                }];
+            }
+            else{
+                _isShowKeyboard=NO;
+            }
+        }
+        else{
+            CDPLog(@"CDPMonitorKeyboard没找到键盘响应view");
         }
     }
 }
@@ -249,29 +274,95 @@
     }];
     
     if (_mode==CDPMonitorKeyboardScrollViewMode) {
-        UIScrollView *scrollView=(UIScrollView *)_superView;
-        for (UIView *view in [_superView subviews]) {
-            if (view.isFirstResponder==YES) {
-                float value1=CDPMaxY(view)-scrollView.contentOffset.y;
-                float value2=CDPGetHeight(scrollView)-value1;
-                if (value2<0) {
-                    scrollView.contentOffset=CGPointMake(0,-value2);
-                    value2=0;
-                }
-                float value=value2+(CDPSHEIGHT-CDPMaxY(scrollView)-_topHeight);
-                
-                [UIView animateWithDuration:0.3 animations:^{
-                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
-                }];
+        UIView *view=[self getResponderViewWithMode:CDPMonitorKeyboardScrollViewMode];
+    
+        if (view) {
+            UIScrollView *scrollView=(UIScrollView *)_superView;
+
+            float value1=CDPMaxY(view)-scrollView.contentOffset.y;
+            float value2=CDPGetHeight(scrollView)-value1;
+            if (value2<0) {
+                scrollView.contentOffset=CGPointMake(0,-value2);
+                value2=0;
             }
+            float value=value2+(CDPSHEIGHT-CDPMaxY(scrollView)-_topHeight);
+            
+            [UIView animateWithDuration:0.3 animations:^{
+                _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+            }];
+        }
+        else{
+            CDPLog(@"CDPMonitorKeyboard没找到键盘响应view");
         }
     }
 }
-
-
-
-
-
+#pragma mark - 根据各模式找到对应键盘响应view
+-(UIView *)getResponderViewWithMode:(CDPMonitorKeyboardMode)mode{
+    if (_responderView!=nil&&[_responderView isKindOfClass:[UIView class]]) {
+        if (_responderView.isFirstResponder==YES) {
+            return _responderView;
+        }
+    }
+    
+    //非_responderView情况
+    switch (_mode) {
+        case CDPMonitorKeyboardDefaultMode:{
+            return [self getResponderViewWithDefaultMode];
+        }
+            break;
+        case CDPMonitorKeyboardTableViewMode:
+            return [self getResponderViewWithTableViewMode];
+            break;
+        case CDPMonitorKeyboardScrollViewMode:
+            return [self getResponderViewWithScrollViewMode];
+            break;
+            
+        default:
+            CDPLog(@"CDPMonitorKeyboardMode模式设定错误");
+            return nil;
+            break;
+    }
+}
+//一般模式
+-(UIView *)getResponderViewWithDefaultMode{
+    for (UIView *view in _superView.subviews) {
+        if (view.isFirstResponder==YES) {
+            return view;
+        }
+    }
+    return nil;
+}
+//tableView模式
+-(UIView *)getResponderViewWithTableViewMode{
+    UITableView *tableView=(UITableView *)_superView;
+    
+    for (UIView *wrapperView in tableView.subviews) {
+        if (CDPGetWidth(wrapperView)==CDPGetWidth(tableView)&&CDPMinX(wrapperView)==0&&CDPMinY(wrapperView)==0) {
+            for (UITableViewCell *cell in [wrapperView subviews]) {
+                for (UIView *view in [cell.contentView subviews]) {
+                    if (view.isFirstResponder==YES) {
+                        return view;
+                    }
+                }
+                for (UIView *view in [cell subviews]) {
+                    if (view.isFirstResponder==YES) {
+                        return view;
+                    }
+                }
+            }
+        }
+    }
+    return nil;
+}
+//scrollView模式
+-(UIView *)getResponderViewWithScrollViewMode{
+    for (UIView *view in _superView.subviews) {
+        if (view.isFirstResponder==YES) {
+            return view;
+        }
+    }
+    return nil;
+}
 
 
 
