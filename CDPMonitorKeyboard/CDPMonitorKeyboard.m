@@ -221,17 +221,13 @@
             UITableView *tableView=(UITableView *)_superView;
             
             UITableViewCell *cell=nil;
-            if ([view.superview.superview isKindOfClass:[UITableViewCell class]]) {
-                //view在cell的contentView上
-                cell=(UITableViewCell *)view.superview.superview;
-            }
-            else if ([view.superview isKindOfClass:[UITableViewCell class]]){
+            if ([view.superview isKindOfClass:[UITableViewCell class]]){
                 //view在cell上
                 cell=(UITableViewCell *)view.superview;
             }
             else{
-                CDPLog(@"当前CDPMonitorKeyboardTableViewMode模式,没有找到键盘响应view所在cell");
-                return;
+                //view在cell的contentView上
+                cell=(UITableViewCell *)view.superview.superview;
             }
             
             _isShowKeyboard=YES;
