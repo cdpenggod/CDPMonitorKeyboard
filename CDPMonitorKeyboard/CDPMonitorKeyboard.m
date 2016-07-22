@@ -203,10 +203,6 @@
             }];
         }
     }
-    else{
-        CDPLog(@"CDPMonitorKeyboard没找到键盘响应view");
-    }
-
 }
 //tableView模式下
 -(void)tableViewModeWithKeyboardHeight:(NSInteger)height{
@@ -258,9 +254,6 @@
                 _isShowKeyboard=NO;
             }
         }
-        else{
-            CDPLog(@"CDPMonitorKeyboard没找到键盘响应view");
-        }
     }
 }
 //scrollView模式下
@@ -286,9 +279,6 @@
             [UIView animateWithDuration:0.3 animations:^{
                 _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
             }];
-        }
-        else{
-            CDPLog(@"CDPMonitorKeyboard没找到键盘响应view");
         }
     }
 }
