@@ -221,9 +221,12 @@
                 //view在cell上
                 cell=(UITableViewCell *)view.superview;
             }
-            else{
+            else if ([view.superview.superview isKindOfClass:[UITableViewCell class]]){
                 //view在cell的contentView上
                 cell=(UITableViewCell *)view.superview.superview;
+            }
+            else{
+                return;
             }
             
             _isShowKeyboard=YES;
@@ -266,6 +269,9 @@
         UIView *view=[self getResponderViewWithMode:CDPMonitorKeyboardScrollViewMode];
     
         if (view) {
+            if ([view.superview isKindOfClass:[UIScrollView class]]==NO) {
+                return;
+            }
             UIScrollView *scrollView=(UIScrollView *)_superView;
 
             float value1=CDPMaxY(view)-scrollView.contentOffset.y;
