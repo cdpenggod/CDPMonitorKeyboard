@@ -25,13 +25,6 @@
     UIButton *backButton=[[UIButton alloc] initWithFrame:CGRectMake(30,60,60,30)];
     [backButton setTitle:@"<返回" forState:UIControlStateNormal];
     backButton.backgroundColor=[UIColor cyanColor];
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    self.view.backgroundColor=[UIColor lightGrayColor];
-
-    UIButton *backButton=[[UIButton alloc] initWithFrame:CGRectMake(30,60,60,30)];
-    [backButton setTitle:@"<返回" forState:UIControlStateNormal];
-    backButton.backgroundColor=[UIColor cyanColor];
     [backButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:backButton];
