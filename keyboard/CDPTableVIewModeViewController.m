@@ -25,6 +25,13 @@
     UIButton *backButton=[[UIButton alloc] initWithFrame:CGRectMake(30,60,60,30)];
     [backButton setTitle:@"<返回" forState:UIControlStateNormal];
     backButton.backgroundColor=[UIColor cyanColor];
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor=[UIColor lightGrayColor];
+
+    UIButton *backButton=[[UIButton alloc] initWithFrame:CGRectMake(30,60,60,30)];
+    [backButton setTitle:@"<返回" forState:UIControlStateNormal];
+    backButton.backgroundColor=[UIColor cyanColor];
     [backButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:backButton];
@@ -33,7 +40,7 @@
     label.font=[UIFont systemFontOfSize:14];
     label.backgroundColor=[UIColor whiteColor];
     label.numberOfLines=0;
-    label.text=@"tableViewMode下输入视图在tableView的cell上,超出键盘高度会向下位移,低于键盘会向上位移,即使输入视图未在屏幕显示完全也会自动使其全部显示,出现在键盘上方高度可以自定义,demo中为0";
+    label.text=@"tableViewMode下输入视图在tableView的cell上,超出键盘高度会向下位移(changeWhenHigher=NO取消),低于键盘会向上位移,即使输入视图未在屏幕显示完全也会自动使其全部显示,出现在键盘上方高度可以自定义,demo中为0";
     [self.view addSubview:label];
     
     UITableView *tableView=[[UITableView alloc] initWithFrame:CGRectMake(28,200,self.view.bounds.size.width-56,self.view.bounds.size.height-200-10) style:UITableViewStylePlain];
@@ -49,8 +56,8 @@
     [self.view addSubview:_topLabel];
 
     
-    //此模式输入视图在tableView的cell上,tableView在主视图上,superView传该tableView
-    [[CDPMonitorKeyboard defaultMonitorKeyboard] sendValueWithSuperView:tableView higherThanKeyboard:0 andMode:CDPMonitorKeyboardTableViewMode navigationControllerTopHeight:0];
+    //此模式输入视图在tableView上或其子view中,即其下级体系中,superView传该tableView
+    [[CDPMonitorKeyboard defaultMonitorKeyboard] sendValueWithSuperView:tableView higherThanKeyboard:0 andMode:CDPMonitorKeyboardTableViewMode];
     //代理看需求，非必须
     [CDPMonitorKeyboard defaultMonitorKeyboard].delegate=self;
     
