@@ -25,6 +25,13 @@
     UIButton *backButton=[[UIButton alloc] initWithFrame:CGRectMake(30,60,60,30)];
     [backButton setTitle:@"<返回" forState:UIControlStateNormal];
     backButton.backgroundColor=[UIColor cyanColor];
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor=[UIColor lightGrayColor];
+
+    UIButton *backButton=[[UIButton alloc] initWithFrame:CGRectMake(30,60,60,30)];
+    [backButton setTitle:@"<返回" forState:UIControlStateNormal];
+    backButton.backgroundColor=[UIColor cyanColor];
     [backButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:backButton];
@@ -49,7 +56,7 @@
     textField1.backgroundColor=[UIColor whiteColor];
     textField1.font=[UIFont systemFontOfSize:14];
     textField1.backgroundColor=[UIColor cyanColor];
-    textField1.text=@"上方输入视图超过键盘下移";
+    textField1.text=@"上方输入视图超过键盘下移(changeWhenHigher=NO取消)";
     [scrollView addSubview:textField1];
     
     UITextField *textField2=[[UITextField alloc] initWithFrame:CGRectMake(14,scrollView.bounds.size.height-80,200,30)];
@@ -59,8 +66,8 @@
     textField2.text=@"下方输入视图低于键盘上移";
     [scrollView addSubview:textField2];
     
-    //此模式输入视图在scrollView上,scrollView在主视图上,superView传该scrollView
-    [[CDPMonitorKeyboard defaultMonitorKeyboard] sendValueWithSuperView:scrollView higherThanKeyboard:0 andMode:CDPMonitorKeyboardScrollViewMode navigationControllerTopHeight:0];
+    //此模式输入视图在scrollView上或其子view中,即其下级体系中,superView传该scrollView
+    [[CDPMonitorKeyboard defaultMonitorKeyboard] sendValueWithSuperView:scrollView higherThanKeyboard:0 andMode:CDPMonitorKeyboardScrollViewMode];
     //代理看需求，非必须
     [CDPMonitorKeyboard defaultMonitorKeyboard].delegate=self;
 
