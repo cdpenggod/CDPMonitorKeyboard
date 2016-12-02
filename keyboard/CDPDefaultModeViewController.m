@@ -34,6 +34,22 @@
     _topLabel.textColor=[UIColor redColor];
     _topLabel.text=@"自动注册键盘监听";
     [self.view addSubview:_topLabel];
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.view.backgroundColor=[UIColor lightGrayColor];
+    
+    UIButton *backButton=[[UIButton alloc] initWithFrame:CGRectMake(30,70,60,30)];
+    [backButton setTitle:@"<返回" forState:UIControlStateNormal];
+    backButton.backgroundColor=[UIColor cyanColor];
+    [backButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    [backButton addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:backButton];
+    
+    _topLabel=[[UILabel alloc] initWithFrame:CGRectMake(100,60,150,30)];
+    _topLabel.textColor=[UIColor redColor];
+    _topLabel.text=@"自动注册键盘监听";
+    [self.view addSubview:_topLabel];
 
     
     UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(14,105,self.view.bounds.size.width-28,100)];
@@ -55,8 +71,8 @@
     textField2.text=@"输入视图低于键盘";
     [self.view addSubview:textField2];
     
-    //此模式输入视图在主视图上，superView传self.view
-    [[CDPMonitorKeyboard defaultMonitorKeyboard] sendValueWithSuperView:self.view higherThanKeyboard:0 andMode:CDPMonitorKeyboardDefaultMode navigationControllerTopHeight:0];
+    //此模式输入视图在UIView上，superView传输入视图所在视图即可
+    [[CDPMonitorKeyboard defaultMonitorKeyboard] sendValueWithSuperView:self.view higherThanKeyboard:0 andMode:CDPMonitorKeyboardDefaultMode];
     //代理看需求，非必须
     [CDPMonitorKeyboard defaultMonitorKeyboard].delegate=self;
 }
