@@ -383,9 +383,10 @@
     for (UIView *wrapperView in tableView.subviews) {
         NSString *className=[NSString stringWithFormat:@"%@",wrapperView.class];
         if (CDPGetWidth(wrapperView)==CDPGetWidth(tableView)&&
-            [className isEqualToString:@"UITableViewWrapperView"]&&
             CDPMinX(wrapperView)==0&&
-            wrapperView.subviews.count>0) {
+            [className isEqualToString:@"UITableViewWrapperView"]&&
+            wrapperView.subviews.count>0&&
+            [wrapperView.subviews[0] isKindOfClass:[UITableViewCell class]]) {
             
             for (UITableViewCell *cell in [wrapperView subviews]) {
                 for (UIView *view in [cell.contentView subviews]) {
