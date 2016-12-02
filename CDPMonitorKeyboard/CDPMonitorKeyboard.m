@@ -347,7 +347,12 @@
             return _responderView;
         }
     }
-    
+    UIView *firstResponder = [CDPWindow performSelector:@selector(firstResponder)];
+    if (firstResponder&&firstResponder.isFirstResponder==YES) {
+        _responderView=firstResponder;
+        return _responderView;
+    }
+
     //非_responderView情况
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:{
