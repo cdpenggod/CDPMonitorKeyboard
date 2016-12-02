@@ -329,7 +329,12 @@
     UITableView *tableView=(UITableView *)_superView;
     
     for (UIView *wrapperView in tableView.subviews) {
-        if (CDPGetWidth(wrapperView)==CDPGetWidth(tableView)&&CDPMinX(wrapperView)==0&&CDPMinY(wrapperView)==0) {
+        NSString *className=[NSString stringWithFormat:@"%@",wrapperView.class];
+        if (CDPGetWidth(wrapperView)==CDPGetWidth(tableView)&&
+            [className isEqualToString:@"UITableViewWrapperView"]&&
+            CDPMinX(wrapperView)==0&&
+            wrapperView.subviews.count>0) {
+
             for (UITableViewCell *cell in [wrapperView subviews]) {
                 for (UIView *view in [cell.contentView subviews]) {
                     if (view.isFirstResponder==YES) {
