@@ -347,30 +347,36 @@
             return _responderView;
         }
     }
-    UIView *firstResponder = [CDPWindow performSelector:@selector(firstResponder)];
-    if (firstResponder&&firstResponder.isFirstResponder==YES) {
-        _responderView=firstResponder;
-        return _responderView;
+    if ([CDPWindow respondsToSelector:@selector(firstResponder)]) {
+        UIView *firstResponder = [CDPWindow performSelector:@selector(firstResponder)];
+        if (firstResponder&&firstResponder.isFirstResponder==YES) {
+            _responderView=firstResponder;
+            return _responderView;
+        }
     }
-
-    //非_responderView情况
+    
+    //主动查找响应view,但输入视图必须在_superView第一层子view
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:{
-            return [self getResponderViewWithDefaultMode];
+            _responderView=[self getResponderViewWithDefaultMode];
         }
             break;
-        case CDPMonitorKeyboardTableViewMode:
-            return [self getResponderViewWithTableViewMode];
+        case CDPMonitorKeyboardTableViewMode:{
+            _responderView=[self getResponderViewWithTableViewMode];
+        }
             break;
-        case CDPMonitorKeyboardScrollViewMode:
-            return [self getResponderViewWithScrollViewMode];
+        case CDPMonitorKeyboardScrollViewMode:{
+            _responderView=[self getResponderViewWithScrollViewMode];
+        }
             break;
             
-        default:
+        default:{
             CDPLog(@"CDPMonitorKeyboardMode模式设定错误");
-            return nil;
+            _responderView=nil;
+        }
             break;
     }
+    return _responderView;
 }
 //一般模式
 -(UIView *)getResponderViewWithDefaultMode{
