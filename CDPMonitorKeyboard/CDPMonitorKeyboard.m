@@ -349,7 +349,9 @@
     }
     if ([CDPWindow respondsToSelector:@selector(firstResponder)]) {
         UIView *firstResponder = [CDPWindow performSelector:@selector(firstResponder)];
-        if (firstResponder&&firstResponder.isFirstResponder==YES) {
+        if (firstResponder&&
+            firstResponder.isFirstResponder==YES&&
+            [firstResponder isKindOfClass:[UIView class]]) {
             _responderView=firstResponder;
             return _responderView;
         }
