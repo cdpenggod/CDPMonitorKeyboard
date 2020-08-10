@@ -44,8 +44,11 @@ typedef NSInteger CDPMonitorKeyboardMode;//模式
 @property (nonatomic,weak) id <CDPMonitorKeyboardDelegate> delegate;
 
 /**
- *  当isShowKeyboard==YES时,tableView滑动可判断YES时不收起键盘
- *  如果项目里写了tableView滑动取消键盘的代码，必须在相关函数里面取消键盘代码前加入此判断
+ *  当isShowKeyboard==YES时,tableView/scrollView 滑动可判断 YES 时不收起键盘
+ *  如果项目里写了 scrollViewDidScroll等 滑动回调，且里面有 取消键盘 的代码，必须判断为 NO 时才取消键盘
+ *  例如  if ([CDPMonitorKeyboard defaultMonitorKeyboard].isShowKeyboard == NO) {
+ *           //此处为取消键盘代码
+ *       }
  */
 @property (nonatomic,assign,readonly) BOOL isShowKeyboard;
 
