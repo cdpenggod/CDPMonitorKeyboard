@@ -24,32 +24,31 @@
 #    define CDPLog(fmt,...) /* */
 #endif
 
-@implementation CDPMonitorKeyboard{
+@implementation CDPMonitorKeyboard {
     
-    UIView *_superView;//输入view的父view
+    UIView *_superView; //输入view的父view
     
-    CDPMonitorKeyboardMode _mode;//当前模式
+    CDPMonitorKeyboardMode _mode; //当前模式
     
-    NSInteger _valueOfHigher;//输入视图需要高出键盘的高度
+    NSInteger _valueOfHigher; //输入视图需要高出键盘的高度
     
-    NSInteger _keyboardHeight;//键盘高度
+    NSInteger _keyboardHeight; //键盘高度
     
-    UIView *_responderView;//记录当前响应键盘view(一般为textField和textView)
+    UIView *_responderView; //记录当前响应键盘view (一般为 textField 和 textView)
 }
 
 //单例化
-+(CDPMonitorKeyboard *)defaultMonitorKeyboard{
-    static CDPMonitorKeyboard *monitorKeyboard= nil;
++ (CDPMonitorKeyboard *)defaultMonitorKeyboard {
+    static CDPMonitorKeyboard *monitorKeyboard = nil;
     static dispatch_once_t onceToken;
     
-    dispatch_once(&onceToken,^{
-        monitorKeyboard=[[self alloc] init];
-        
+    dispatch_once(&onceToken, ^{
+        monitorKeyboard = [[self alloc] init];
     });
     return monitorKeyboard;
 }
--(instancetype)init{
-    if (self=[super init]) {
+- (instancetype)init {
+    if (self = [super init]) {
         //增加监听，当键盘出现时收消息
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         //增加监听，当键盘退出时收消息
@@ -59,37 +58,33 @@
         //增加监听，当textView开始编辑时收消息
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewBeginEdit:) name:UITextViewTextDidBeginEditingNotification object:nil];
     }
-    
     return self;
 }
--(void)dealloc{
+- (void)dealloc {
     //取消监听
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextViewTextDidBeginEditingNotification object:nil];
-    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+#pragma mark - API 调用
 //自动监听调用方法(仅需调用一次，若果需要改变参数再调用)
--(void)sendValueWithSuperView:(UIView *)superView higherThanKeyboard:(NSInteger)valueOfHigher andMode:(CDPMonitorKeyboardMode)mode{
-    _superView=superView;
-    _valueOfHigher=valueOfHigher;
-    _mode=mode;
+- (void)sendValueWithSuperView:(UIView *)superView higherThanKeyboard:(NSInteger)valueOfHigher andMode:(CDPMonitorKeyboardMode)mode {
+    _superView = superView;
+    _valueOfHigher = valueOfHigher;
+    _mode = mode;
 }
 //清空并重置所有相关数据,防止因为单例造成内存问题(推荐在dealloc中调用)
--(void)clearAll{
-    _superView=nil;
-    _valueOfHigher=0;
-    _mode=0;
-    _delegate=nil;
-    _changeWhenHigher=NO;
-    _isShowKeyboard=NO;
-    _responderView=nil;
+- (void)clearAll {
+    _superView = nil;
+    _valueOfHigher = 0;
+    _mode = 0;
+    _delegate = nil;
+    _changeWhenHigher = NO;
+    _isShowKeyboard = NO;
+    _responderView = nil;
 }
-#pragma mark - textField和textView开始编辑监听
+#pragma mark - textField 和 textView 开始编辑监听
 //textField开始编辑监听
--(void)textFieldBeginEdit:(NSNotification *)notification{
-    _responderView=notification.object;
+- (void)textFieldBeginEdit:(NSNotification *)notification {
+    _responderView = notification.object;
     
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:
@@ -108,8 +103,8 @@
     }
 }
 //textView开始编辑监听
--(void)textViewBeginEdit:(NSNotification *)notification{
-    _responderView=notification.object;
+- (void)textViewBeginEdit:(NSNotification *)notification {
+    _responderView = notification.object;
     
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:
@@ -129,28 +124,30 @@
 }
 #pragma mark - 监听系统键盘
 //键盘出现
--(void)keyboardWillShow:(NSNotification *)notification{
+- (void)keyboardWillShow:(NSNotification *)notification {
     [self didKeyboardWillShowWithNotification:notification];
+    
     if (_delegate) {
         [_delegate didWhenKeyboardWillShow:notification];
     }
 }
 //键盘消失
--(void)keyboardWillHide:(NSNotification *)notification{
+- (void)keyboardWillHide:(NSNotification *)notification {
     [self didKeyboardWillHide];
+    
     if (_delegate) {
         [_delegate didWhenKeyboardWillHide:notification];
     }
 }
 #pragma mark - 键盘出现和消失调用方法
 //当键盘出现时调用方法
--(void)didKeyboardWillShowWithNotification:(NSNotification *)notification{
+- (void)didKeyboardWillShowWithNotification:(NSNotification *)notification {
     //获取键盘的高度
-    NSDictionary *userInfo=[notification userInfo];
+    NSDictionary *userInfo = [notification userInfo];
     NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGRect keyboardRect = [aValue CGRectValue];
     NSInteger height = keyboardRect.size.height;
-    _keyboardHeight=height;
+    _keyboardHeight = height;
     
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:
@@ -167,60 +164,58 @@
             CDPLog(@"CDPMonitorKeyboardMode模式设定错误");
             break;
     }
-    
 }
 //当键退出时调用
--(void)didKeyboardWillHide{
+- (void)didKeyboardWillHide {
     [UIView animateWithDuration:0.3 animations:^{
         if (_superView) {
-            _superView.transform=CGAffineTransformIdentity;
+            _superView.transform = CGAffineTransformIdentity;
         }
     }];
 }
 #pragma mark - 键盘各模式
 //一般模式下
--(void)defaultModeWithKeyboardHeight:(NSInteger)height{
+- (void)defaultModeWithKeyboardHeight:(NSInteger)height {
     [UIView animateWithDuration:0.25 animations:^{
-        _superView.transform=CGAffineTransformIdentity;
+        _superView.transform = CGAffineTransformIdentity;
     }];
     
-    UIView *view=[self getResponderViewWithMode:CDPMonitorKeyboardDefaultMode];
+    UIView *view = [self getResponderViewWithMode:CDPMonitorKeyboardDefaultMode];
     
     if (view) {
-        UIView *superView=nil;
-        UIView *theView=view.superview;
-        while (superView==nil&&theView!=nil) {
-            if ([theView isKindOfClass:[UIView class]]&&theView==_superView){
-                superView=_superView;
+        UIView *superView = nil;
+        UIView *theView = view.superview;
+        while (superView == nil && theView) {
+            if ([theView isKindOfClass:[UIView class]] && theView == _superView){
+                superView = _superView;
             }
             else if ([theView isKindOfClass:[UIWindow class]]){
                 break;
             }
             
-            theView=theView.superview;
+            theView = theView.superview;
         }
         
-        if (superView==nil) {
+        if (superView == nil) {
             //view不在指定superView上
             return;
         }
         
-        CGRect viewRect=[view.superview convertRect:view.frame toView:CDPWindow];
+        CGRect viewRect = [view.superview convertRect:view.frame toView:CDPWindow];
         
-        float value=CDPSHEIGHT-CGRectGetMaxY(viewRect);
+        float value = CDPSHEIGHT - CGRectGetMaxY(viewRect);
         
-        if (value<height+_valueOfHigher) {
+        if (value < height + _valueOfHigher) {
             [UIView animateWithDuration:0.3 animations:^{
                 //防止超出屏幕最大范围
-                if (CDPGetWidth(_superView)==CDPSWIDTH&&
-                    CDPGetHeight(_superView)==CDPSHEIGHT&&
-                    value<0&&
-                    (height-value)+_valueOfHigher-height>0) {
+                if (CDPGetWidth(_superView) == CDPSWIDTH &&
+                    CDPGetHeight(_superView) == CDPSHEIGHT &&
+                    value < 0 &&
+                    (height - value) + _valueOfHigher - height > 0) {
                     
-                    _superView.transform=CGAffineTransformMakeTranslation(0,-height);
-                }
-                else{
-                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+                    _superView.transform = CGAffineTransformMakeTranslation(0, - height);
+                } else {
+                    _superView.transform = CGAffineTransformMakeTranslation(0, value - height - _valueOfHigher);
                 }
             }];
         }
@@ -228,131 +223,134 @@
     
 }
 //tableView模式下
--(void)tableViewModeWithKeyboardHeight:(NSInteger)height{
+- (void)tableViewModeWithKeyboardHeight:(NSInteger)height {
     [UIView animateWithDuration:0.25 animations:^{
-        _superView.transform=CGAffineTransformIdentity;
+        _superView.transform = CGAffineTransformIdentity;
     }];
     
-    if (_mode==CDPMonitorKeyboardTableViewMode) {
-        UIView *view=[self getResponderViewWithMode:CDPMonitorKeyboardTableViewMode];
+    if (_mode == CDPMonitorKeyboardTableViewMode) {
+        UIView *view = [self getResponderViewWithMode:CDPMonitorKeyboardTableViewMode];
         
         if (view) {
-            UITableView *tableView=nil;
-            UITableViewCell *cell=nil;
-            UIView *superView=view.superview;
-            while (tableView==nil&&superView!=nil) {
-                if ([superView isKindOfClass:[UITableView class]]&&superView==_superView){
-                    tableView=(UITableView *)_superView;
-                }
-                else if ([superView isKindOfClass:[UITableViewCell class]]){
-                    cell=(UITableViewCell *)superView;
-                }
-                else if ([superView isKindOfClass:[UIWindow class]]){
+            UITableView *tableView = nil;
+            UITableViewCell *cell = nil;
+            UIView *superView = view.superview;
+            while (tableView == nil && superView) {
+                if ([superView isKindOfClass:[UITableView class]] && superView == _superView){
+                    tableView = (UITableView *)_superView;
+                } else if ([superView isKindOfClass:[UITableViewCell class]]){
+                    cell = (UITableViewCell *)superView;
+                } else if ([superView isKindOfClass:[UIWindow class]]){
                     break;
                 }
                 
-                superView=superView.superview;
+                superView = superView.superview;
             }
             
-            if (tableView==nil) {
+            if (tableView == nil) {
                 //view不在指定tableView上
                 return;
             }
             
-            _isShowKeyboard=YES;
-            if (tableView.contentOffset.y>0&&_changeWhenHigher==YES&&cell) {
-                NSIndexPath *indexPath=[tableView indexPathForCell:cell];
+            _isShowKeyboard = YES;
+            if (tableView.contentOffset.y > 0 && _changeWhenHigher && cell) {
+                NSIndexPath *indexPath = [tableView indexPathForCell:cell];
                 [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
             }
             
-            CGRect viewRect=[view.superview convertRect:view.frame toView:CDPWindow];
-            CGRect tableViewRect=[tableView.superview convertRect:tableView.frame toView:CDPWindow];
+            CGRect viewRect = [view.superview convertRect:view.frame toView:CDPWindow];
+            CGRect tableViewRect = [tableView.superview convertRect:tableView.frame toView:CDPWindow];
             
-            float value2=CGRectGetMaxY(tableViewRect)-CGRectGetMaxY(viewRect);
+            float value2 = CGRectGetMaxY(tableViewRect) - CGRectGetMaxY(viewRect);
             
-            if (value2<0) {
-                float y=tableView.contentOffset.y;
-                tableView.contentOffset=CGPointMake(0,y-value2);
-                value2=0;
+            if (value2 < 0) {
+                float y = tableView.contentOffset.y;
+                tableView.contentOffset = CGPointMake(0, y - value2);
+                value2 = 0;
             }
-            float value=value2+(CDPSHEIGHT-CGRectGetMaxY(tableViewRect));
+            float value = value2 + (CDPSHEIGHT - CGRectGetMaxY(tableViewRect));
             
             //判断changeWhenHigher以及是否被遮挡,不遮挡则不改变
-            if(_changeWhenHigher==YES||value-height-_valueOfHigher<0){
+            if(_changeWhenHigher || value - height - _valueOfHigher < 0){
                 [UIView animateWithDuration:0.3 animations:^{
-                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+                    _superView.transform = CGAffineTransformMakeTranslation(0, value - height - _valueOfHigher);
                 }completion:^(BOOL finished) {
-                    _isShowKeyboard=NO;
+                    _isShowKeyboard = NO;
                 }];
-            }
-            else{
-                _isShowKeyboard=NO;
+            } else{
+                _isShowKeyboard = NO;
             }
         }
         
     }
 }
 //scrollView模式下
--(void)scrollViewModeWithKeyboardHeight:(NSInteger)height{
+- (void)scrollViewModeWithKeyboardHeight:(NSInteger)height {
     [UIView animateWithDuration:0.25 animations:^{
-        _superView.transform=CGAffineTransformIdentity;
+        _superView.transform = CGAffineTransformIdentity;
     }];
     
-    if (_mode==CDPMonitorKeyboardScrollViewMode) {
-        UIView *view=[self getResponderViewWithMode:CDPMonitorKeyboardScrollViewMode];
+    if (_mode == CDPMonitorKeyboardScrollViewMode) {
+        UIView *view = [self getResponderViewWithMode:CDPMonitorKeyboardScrollViewMode];
         
         if (view) {
-            UIScrollView *scrollView=nil;
-            UIView *superView=view.superview;
-            while (scrollView==nil&&superView!=nil) {
-                if ([superView isKindOfClass:[UIScrollView class]]&&superView==_superView){
-                    scrollView=(UIScrollView *)_superView;
+            UIScrollView *scrollView = nil;
+            UIView *superView = view.superview;
+            while (scrollView == nil && superView) {
+                if ([superView isKindOfClass:[UIScrollView class]] && superView == _superView){
+                    scrollView = (UIScrollView *)_superView;
                 }
                 else if ([superView isKindOfClass:[UIWindow class]]){
                     break;
                 }
                 
-                superView=superView.superview;
+                superView = superView.superview;
             }
             
-            if (scrollView==nil) {
+            if (scrollView == nil) {
                 //view不在指定scrollView上
                 return;
             }
-            CGRect viewRect=[view.superview convertRect:view.frame toView:CDPWindow];
-            CGRect scrollViewRect=[scrollView.superview convertRect:scrollView.frame toView:CDPWindow];
             
-            float value2=CGRectGetMaxY(scrollViewRect)-CGRectGetMaxY(viewRect);
+            _isShowKeyboard = YES;
             
-            if (value2<0) {
-                float y=scrollView.contentOffset.y;
-                scrollView.contentOffset=CGPointMake(0,y-value2);
-                value2=0;
+            CGRect viewRect = [view.superview convertRect:view.frame toView:CDPWindow];
+            CGRect scrollViewRect = [scrollView.superview convertRect:scrollView.frame toView:CDPWindow];
+            
+            float value2 = CGRectGetMaxY(scrollViewRect) - CGRectGetMaxY(viewRect);
+            
+            if (value2 < 0) {
+                float y = scrollView.contentOffset.y;
+                scrollView.contentOffset = CGPointMake(0, y - value2);
+                value2 = 0;
             }
-            float value=value2+(CDPSHEIGHT-CGRectGetMaxY(scrollViewRect));
+            float value = value2 + (CDPSHEIGHT - CGRectGetMaxY(scrollViewRect));
             
-            if(_changeWhenHigher==YES||value-height-_valueOfHigher<0){
+            if(_changeWhenHigher || value - height - _valueOfHigher < 0){
                 [UIView animateWithDuration:0.3 animations:^{
-                    _superView.transform=CGAffineTransformMakeTranslation(0,value-height-_valueOfHigher);
+                    _superView.transform = CGAffineTransformMakeTranslation(0, value - height - _valueOfHigher);
+                } completion:^(BOOL finished) {
+                    _isShowKeyboard = NO;
                 }];
+            } else{
+                _isShowKeyboard = NO;
             }
         }
-        
     }
 }
 #pragma mark - 根据各模式找到对应键盘响应view
--(UIView *)getResponderViewWithMode:(CDPMonitorKeyboardMode)mode{
-    if (_responderView!=nil&&[_responderView isKindOfClass:[UIView class]]) {
-        if (_responderView.isFirstResponder==YES) {
+- (UIView *)getResponderViewWithMode:(CDPMonitorKeyboardMode)mode {
+    if (_responderView && [_responderView isKindOfClass:[UIView class]]) {
+        if (_responderView.isFirstResponder) {
             return _responderView;
         }
     }
     if ([CDPWindow respondsToSelector:@selector(firstResponder)]) {
         UIView *firstResponder = [CDPWindow performSelector:@selector(firstResponder)];
         if (firstResponder&&
-            firstResponder.isFirstResponder==YES&&
+            firstResponder.isFirstResponder&&
             [firstResponder isKindOfClass:[UIView class]]) {
-            _responderView=firstResponder;
+            _responderView = firstResponder;
             return _responderView;
         }
     }
@@ -360,55 +358,55 @@
     //主动查找响应view,但输入视图必须在_superView第一层子view
     switch (_mode) {
         case CDPMonitorKeyboardDefaultMode:{
-            _responderView=[self getResponderViewWithDefaultMode];
+            _responderView = [self getResponderViewWithDefaultMode];
         }
             break;
         case CDPMonitorKeyboardTableViewMode:{
-            _responderView=[self getResponderViewWithTableViewMode];
+            _responderView = [self getResponderViewWithTableViewMode];
         }
             break;
         case CDPMonitorKeyboardScrollViewMode:{
-            _responderView=[self getResponderViewWithScrollViewMode];
+            _responderView = [self getResponderViewWithScrollViewMode];
         }
             break;
             
         default:{
             CDPLog(@"CDPMonitorKeyboardMode模式设定错误");
-            _responderView=nil;
+            _responderView = nil;
         }
             break;
     }
     return _responderView;
 }
 //一般模式
--(UIView *)getResponderViewWithDefaultMode{
+- (UIView *)getResponderViewWithDefaultMode {
     for (UIView *view in _superView.subviews) {
-        if (view.isFirstResponder==YES) {
+        if (view.isFirstResponder) {
             return view;
         }
     }
     return nil;
 }
 //tableView模式
--(UIView *)getResponderViewWithTableViewMode{
-    UITableView *tableView=(UITableView *)_superView;
+- (UIView *)getResponderViewWithTableViewMode {
+    UITableView *tableView = (UITableView *)_superView;
     
     for (UIView *wrapperView in tableView.subviews) {
-        NSString *className=[NSString stringWithFormat:@"%@",wrapperView.class];
-        if (CDPGetWidth(wrapperView)==CDPGetWidth(tableView)&&
-            CDPMinX(wrapperView)==0&&
-            [className isEqualToString:@"UITableViewWrapperView"]&&
-            wrapperView.subviews.count>0&&
+        NSString *className = [NSString stringWithFormat:@"%@", wrapperView.class];
+        if (CDPGetWidth(wrapperView) == CDPGetWidth(tableView) &&
+            CDPMinX(wrapperView) == 0 &&
+            [className isEqualToString:@"UITableViewWrapperView"] &&
+            wrapperView.subviews.count > 0 &&
             [wrapperView.subviews[0] isKindOfClass:[UITableViewCell class]]) {
             
             for (UITableViewCell *cell in [wrapperView subviews]) {
                 for (UIView *view in [cell.contentView subviews]) {
-                    if (view.isFirstResponder==YES) {
+                    if (view.isFirstResponder) {
                         return view;
                     }
                 }
                 for (UIView *view in [cell subviews]) {
-                    if (view.isFirstResponder==YES) {
+                    if (view.isFirstResponder) {
                         return view;
                     }
                 }
@@ -418,9 +416,9 @@
     return nil;
 }
 //scrollView模式
--(UIView *)getResponderViewWithScrollViewMode{
+- (UIView *)getResponderViewWithScrollViewMode {
     for (UIView *view in _superView.subviews) {
-        if (view.isFirstResponder==YES) {
+        if (view.isFirstResponder) {
             return view;
         }
     }
